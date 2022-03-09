@@ -46,4 +46,13 @@ goods:
 	mkdir -p ${GOODS_DIR} \
     && abigen --sol ${CUR_DIR}/contracts/TTPGOODS.sol --pkg goods --out ./bcos/goods/TTPGOODS.go
 
+account:
+	go run cmd/main.go account
+
+deploy:
+	go run cmd/main.go deploy
+
+mint:
+	go run cmd/main.go mint
+
 all: erc20 erc721 nft goods
