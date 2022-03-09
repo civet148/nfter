@@ -1,3 +1,5 @@
+pragma solidity ^0.4.24;
+
 import "./zeppelin/ERC721Full.sol";
 import "./zeppelin/ERC721MetadataMintable.sol";
 

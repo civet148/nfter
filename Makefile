@@ -40,11 +40,13 @@ erc721:
 
 nft:
 	mkdir -p ${NFT_DIR} \
-    && abigen --sol ${CUR_DIR}/contracts/TTPNFT.sol --pkg nft --out ./bcos/nft/TTPNFT.go
+    && abigen --sol ${CUR_DIR}/contracts/TTPNFT.sol --pkg nft --out ./bcos/nft/TTPNFT.go \
+    && solc --bin --abi --overwrite -o ./bcos/abi ${CUR_DIR}/contracts/TTPNFT.sol
 
 goods:
 	mkdir -p ${GOODS_DIR} \
-    && abigen --sol ${CUR_DIR}/contracts/TTPGOODS.sol --pkg goods --out ./bcos/goods/TTPGOODS.go
+    && abigen --sol ${CUR_DIR}/contracts/TTPGOODS.sol --pkg goods --out ./bcos/goods/TTPGOODS.go \
+    && solc --bin --abi --overwrite -o ./bcos/abi ${CUR_DIR}/contracts/TTPGOODS.sol
 
 account:
 	go run cmd/main.go account
