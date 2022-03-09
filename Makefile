@@ -49,7 +49,7 @@ goods:
     && solc --bin --abi --overwrite -o ./bcos/abi ${CUR_DIR}/contracts/TTPGOODS.sol
 
 build:
-	cd ${CUR_DIR}/cmd && go build -o nfter
+	cd ${CUR_DIR}/cmd && go build -ldflags "-s -w -X 'main.BuildTime=${DATE_TIME}' -X 'main.GitCommit=${COMMIT_ID}'" -o nfter
 
 account:build
 	${CUR_DIR}/cmd/nfter account
