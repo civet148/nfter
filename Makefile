@@ -49,18 +49,18 @@ goods:
     && solc --bin --abi --overwrite -o ./bcos/abi ${CUR_DIR}/contracts/TTPGOODS.sol
 
 account:
-	go run cmd/main.go account
+	cd cmd && go build -o nfter && ./nfter account
 
 deploy:
-	go run cmd/main.go deploy
+	cd cmd && go build -o nfter && ./nfter deploy
 
 query:
-	go run cmd/main.go query
+	cd cmd && go build -o nfter && ./nfter query
 
 transfer:
-	go run cmd/main.go transfer
+	cd cmd && go build -o nfter && ./nfter transfer
 
 mint:
-	go run cmd/main.go mint
+	cd cmd && go build -o nfter && ./nfter mint
 
 all: erc20 erc721 nft goods
