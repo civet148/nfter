@@ -52,6 +52,12 @@ account:
 deploy:
 	go run cmd/main.go deploy
 
+query:
+	go run cmd/main.go query
+
+transfer:
+	go run cmd/main.go transfer
+
 mint:
 	go run cmd/main.go mint
 

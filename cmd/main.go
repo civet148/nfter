@@ -26,9 +26,11 @@ var (
 )
 
 const (
-	CmdNameAccount = "account"
-	CmdNameDeploy  = "deploy"
-	CmdNameMint    = "mint"
+	CmdNameAccount  = "account"
+	CmdNameDeploy   = "deploy"
+	CmdNameMint     = "mint"
+	CmdNameQuery    = "query"
+	CmdNameTransfer = "transfer"
 )
 
 const (
@@ -49,6 +51,7 @@ var (
 	publicKey       = "0237d17a2629880a170b26f30cdda5f4d10824049ccc65afbbe32785147bed7517"
 	contractAddress = "0x7f0e7fE7d4D199b3A96cD1B8BaD7bf84c144A00E"
 	ownerAddress    = "0xfcf3fee2901602b76371bded8d15c973a9fa700d"
+	receiveAddress  = "0x5B0c43004e0a68Eb197c629CE78Da62d65Aa6C03"
 	tokenURI        = "https://cdn.pixabay.com/photo/2022/02/26/18/16/peace-7036144_960_720.png"
 )
 
@@ -84,6 +87,8 @@ func main() {
 		accountCmd,
 		deployCmd,
 		mintCmd,
+		queryCmd,
+		transferCmd,
 	}
 	app := &cli.App{
 		Name:     ProgramName,
@@ -222,12 +227,13 @@ var mintCmd = &cli.Command{
 			return err
 		}
 		log.Infof("NFT contract address [%s]", ca.Address())
-		log.Infof("NFT owner address [%s]", ca.Address())
+
 		oa, err := common.NewMixedcaseAddressFromString(ownerAddress)
 		if err != nil {
 			log.Fatal("NewMixedcaseAddressFromString error [%s]", err)
 			return err
 		}
+		log.Infof("NFT owner address [%s]", oa.Address())
 
 		ttp, err := nft.NewTTPNft(ca.Address(), client)
 		if err != nil {
@@ -243,17 +249,148 @@ var mintCmd = &cli.Command{
 		}
 		log.Infof("tx [%+v]", tx)
 		log.Infof("receipt [%+v]", receipt)
-		//address, tx, instance, err := nft.DeployTTPNft(client.GetTransactOpts(), client)
+		return nil
+	},
+}
+
+var queryCmd = &cli.Command{
+	Name:      CmdNameQuery,
+	Usage:     "query NFT",
+	ArgsUsage: "",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:  CmdFlagNodeUrl,
+			Usage: "FISCO-BCOS node url",
+			Value: DefaultNodeUrl,
+		},
+		&cli.Int64Flag{
+			Name:  CmdFlagChainID,
+			Usage: "chain id",
+			Value: DefaultChainID,
+		},
+		&cli.IntFlag{
+			Name:  CmdFlagGroupID,
+			Usage: "group id",
+			Value: DefaultGroupID,
+		},
+	},
+	Action: func(cctx *cli.Context) error {
+
+		pk, err := hex.DecodeString(privateKey)
+		if err != nil {
+			log.Errorf("decode address [%s] private key [%s] error [%s]", accountAddress, publicKey, err.Error())
+			return err
+		}
+
+		client, err := newHttpClient(cctx, pk)
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+		defer client.Close()
+
+		ca, err := common.NewMixedcaseAddressFromString(contractAddress)
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+		log.Infof("NFT contract address [%s]", ca.Address())
+		oa, err := common.NewMixedcaseAddressFromString(ownerAddress)
+		if err != nil {
+			log.Fatal("NewMixedcaseAddressFromString error [%s]", err)
+			return err
+		}
+		log.Infof("NFT owner address [%s]", oa.Address())
+		ttp, err := nft.NewTTPNft(ca.Address(), client)
+		if err != nil {
+			log.Fatal("NewMixedcaseAddressFromString error [%s]", err)
+			return err
+		}
+
+		var tokenId = big.NewInt(1)
+		owner, err := ttp.OwnerOf(client.GetCallOpts(), tokenId)
+		if err != nil {
+			log.Fatal("OwnerOf error [%s]", err)
+			return err
+		}
+		supply, err := ttp.TotalSupply(client.GetCallOpts())
+		if err != nil {
+			log.Fatal("TotalSupply error [%s]", err)
+			return err
+		}
+		uri, err := ttp.TokenURI(client.GetCallOpts(), tokenId)
+		if err != nil {
+			log.Fatal("TokenURI error [%s]", err)
+			return err
+		}
+		log.Infof("NFT token id [%d] owner address [%s] supply [%d] uri [%s]", tokenId.Int64(), owner.String(), supply, uri)
+		return nil
+	},
+}
+
+var transferCmd = &cli.Command{
+	Name:      CmdNameTransfer,
+	Usage:     "transfer NFT",
+	ArgsUsage: "",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:  CmdFlagNodeUrl,
+			Usage: "FISCO-BCOS node url",
+			Value: DefaultNodeUrl,
+		},
+		&cli.Int64Flag{
+			Name:  CmdFlagChainID,
+			Usage: "chain id",
+			Value: DefaultChainID,
+		},
+		&cli.IntFlag{
+			Name:  CmdFlagGroupID,
+			Usage: "group id",
+			Value: DefaultGroupID,
+		},
+	},
+	Action: func(cctx *cli.Context) error {
+
+		//pk, err := hex.DecodeString(privateKey)
 		//if err != nil {
-		//	log.Errorf("DeployTTPNft error [%s]", err)
+		//	log.Errorf("decode address [%s] private key [%s] error [%s]", accountAddress, publicKey, err.Error())
 		//	return err
 		//}
-		//log.Infof("contract address: %s", address.Hex()) // the address should be saved
-		//log.Infof("transaction hash: %s", tx.Hash().Hex())
-		//_ = instance
-		//session := &nft.TTPNftSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
-		//_ = session
-		//session.MintWithTokenURI()
+		//
+		//client, err := newHttpClient(cctx, pk)
+		//if err != nil {
+		//	log.Fatal(err)
+		//	return err
+		//}
+		//defer client.Close()
+		//
+		//ca, err := common.NewMixedcaseAddressFromString(contractAddress)
+		//if err != nil {
+		//	log.Fatal(err)
+		//	return err
+		//}
+		//log.Infof("NFT contract address [%s]", ca.Address())
+		//log.Infof("NFT owner address [%s]", ca.Address())
+		//oa, err := common.NewMixedcaseAddressFromString(ownerAddress)
+		//if err != nil {
+		//	log.Fatal("NewMixedcaseAddressFromString error [%s]", err)
+		//	return err
+		//}
+		//
+		//ttp, err := nft.NewTTPNft(ca.Address(), client)
+		//if err != nil {
+		//	log.Fatal("NewMixedcaseAddressFromString error [%s]", err)
+		//	return err
+		//}
+		//
+		//var tokenId = big.NewInt(1)
+		//tx, receipt, err := ttp.MintWithTokenURI(client.GetTransactOpts(), oa.Address(), tokenId, tokenURI)
+		//if err != nil {
+		//	log.Fatal("MintWithTokenURI error [%s]", err)
+		//	return err
+		//}
+		//log.Infof("tx [%+v]", tx)
+		//log.Infof("receipt [%+v]", receipt)
 		return nil
 	},
 }
