@@ -48,19 +48,22 @@ goods:
     && abigen --sol ${CUR_DIR}/contracts/TTPGOODS.sol --pkg goods --out ./bcos/goods/TTPGOODS.go \
     && solc --bin --abi --overwrite -o ./bcos/abi ${CUR_DIR}/contracts/TTPGOODS.sol
 
-account:
-	cd cmd && go build -o nfter && ./nfter account
+build:
+	cd ${CUR_DIR}/cmd && go build -o nfter
 
-deploy:
-	cd cmd && go build -o nfter && ./nfter deploy
+account:build
+	${CUR_DIR}/cmd/nfter account
 
-query:
-	cd cmd && go build -o nfter && ./nfter query
+deploy:build
+	${CUR_DIR}/cmd/nfter deploy
 
-transfer:
-	cd cmd && go build -o nfter && ./nfter transfer
+query:build
+	${CUR_DIR}/cmd/nfter query
 
-mint:
-	cd cmd && go build -o nfter && ./nfter mint
+transfer:build
+	${CUR_DIR}/cmd/nfter transfer
 
-all: erc20 erc721 nft goods
+mint:build
+	${CUR_DIR}/cmd/nfter mint
+
+contract: erc20 erc721 nft goods
