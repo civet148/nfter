@@ -27,8 +27,7 @@ solc:
 	&& go build -o console cmd/console.go \
 	&& go build -o abigen cmd/abigen/main.go \
 	&& sudo cp abigen /usr/bin \
-	&& cd ${GOSDK_DIR}/tools && ./download_solc.sh ${SOLC_VER} && sudo mv solc-${SOLC_VER} /usr/bin/solc \
-	&& cd ${CUR_DIR}
+	&& chmod +x ${GOSDK_DIR}/tools/download_solc.sh && ${GOSDK_DIR}/tools/download_solc.sh ${SOLC_VER} && sudo mv solc-${SOLC_VER} /usr/bin && sudo ln -nsf solc-${SOLC_VER} /usr/bin/solc
 
 erc20:
 	mkdir -p ${ERC20_DIR} \
